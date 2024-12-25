@@ -15,11 +15,11 @@ export function paginationMiddleware(
   next: NextFunction
 ): void {
   const page = parseInt(req.query.page as string) || 1;
-  const itemsPerPage = parseInt(req.query.itemsPerPage as string) || 10;
-  const skip = itemsPerPage === -1 ? undefined : (page - 1) * itemsPerPage;
-  const take = itemsPerPage === -1 ? undefined : itemsPerPage;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const skip = limit === -1 ? undefined : (page - 1) * limit;
+  const take = limit === -1 ? undefined : limit;
 
-  req.pagination = { skip, take, page, itemsPerPage };
+  req.pagination = { skip, take, page, limit };
 
   next();
 }
