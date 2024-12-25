@@ -28,6 +28,8 @@ async function getPaymentType(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid id",
     });
+
+    return;
   }
 
   try {
@@ -57,18 +59,22 @@ async function createPaymentType(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid body",
     });
+
+    return;
   }
 
   if(!body.name) {
     res.status(400).json({
       message: "Invalid name",
     });
+
+    return;
   }
 
   try {
     const paymentType = await db.paymentType.create({
       data: {
-        name: body.name!,
+        name: body.name,
       },
     });
 
@@ -93,12 +99,16 @@ async function updatePaymentType(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid id",
     });
+
+    return;
   }
 
   if (!body) {
     res.status(400).json({
       message: "Invalid body",
     });
+
+    return;
   }
 
   try {
@@ -129,6 +139,8 @@ async function deletePaymentType(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid id",
     });
+
+    return;
   }
 
   try {
