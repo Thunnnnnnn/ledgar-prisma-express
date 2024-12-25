@@ -27,6 +27,7 @@ async function getUsers(req: Request, res: Response): Promise<void> {
       data: users,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Internal server error",
     });
@@ -69,13 +70,31 @@ async function createUser(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid body",
     });
+
+    return;
   }
 
   if (!body.email || !body.password) {
     res.status(400).json({
       message: "Invalid email or password",
     });
+
+    return
   }
+
+  const userExist = await db.user.findUnique({
+    where: {
+      email: body.email,
+    },
+  })
+
+  if(userExist) {
+    res.status(400).json({
+      message: "Email already exist",
+    });
+    return;
+  }
+
   try {
     const user = await db.user.create({
       data: {
@@ -105,12 +124,16 @@ async function updateUser(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       message: "Invalid body",
     });
+
+    return;
   }
 
   if (!body.id) {
     res.status(400).json({
       message: "Invalid id",
     });
+
+    return;
   }
 
   try {
