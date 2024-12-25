@@ -43,8 +43,6 @@ async function login(req: Request, res: Response): Promise<void> {
       token,
     };
 
-    console.log(token);
-
     req.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 1 day
     res.status(200).json({
       message: "Login successful",
@@ -77,7 +75,7 @@ async function checkAuth(
   next: NextFunction
 ): Promise<void> {
   if (req.session.user) {
-    const token = req.headers.authorization?.split("Bearer ")[1];
+    const token = req.headers.authorization?.split("Bearer ")[1]; // ต้องการ token ที่อยู่หลัง Bearer
 
     if (!token || typeof token !== "string") {
       res.status(401).json({
