@@ -2,7 +2,7 @@ import { Payment } from "./payment.type";
 
 export interface TransactionSlip {
   id?: number;
-  slipUrl?: number;
+  slipUrl?: string;
   note?: string;
   createdAt?: Date;
   updatedAt?: Date;
