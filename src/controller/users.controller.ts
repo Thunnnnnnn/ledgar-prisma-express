@@ -99,8 +99,8 @@ async function createUser(req: Request, res: Response): Promise<void> {
     const user = await db.user.create({
       data: {
         name: body.name ? body.name : undefined,
-        email: body.email!,
-        password: await hashPassword(body.password!),
+        email: body.email,
+        password: await hashPassword(body.password),
       },
     });
 
