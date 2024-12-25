@@ -1,8 +1,10 @@
 import { Router } from "express";
-import userRouter from "./users.routes";
-import paymentTypeRouter from "./paymentType.routes";
+import userRoute from "./users.routes";
+import paymentTypeRoute from "./paymentType.routes";
+import paymentRoute from "./payment.routes";
 
 export default (app: { use: (arg0: string, arg1: Router) => void }) => {
-    app.use("/users", userRouter);
-    app.use("/payment-types", paymentTypeRouter);
+    app.use("/users", userRoute);
+    app.use("/payment-types", paymentTypeRoute);
+    app.use("/payments", paymentRoute);
 }
