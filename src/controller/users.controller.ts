@@ -4,15 +4,15 @@ import { db } from "../untils/db";
 import { User } from "../type/users.type";
 
 const hashPassword = async (password: string): Promise<string> => {
-    const saltRounds = 10; // จำนวนรอบในการสร้าง salt
-    try {
-      const hash = await bcrypt.hash(password, saltRounds);
-      return hash;
-    } catch (err) {
-      console.error("Error hashing password:", err);
-      throw new Error("Error hashing password");
-    }
-  };
+  const saltRounds = 10; // จำนวนรอบในการสร้าง salt
+  try {
+    const hash = await bcrypt.hash(password, saltRounds);
+    return hash;
+  } catch (err) {
+    console.error("Error hashing password:", err);
+    throw new Error("Error hashing password");
+  }
+};
 
 async function getUsers(req: Request, res: Response): Promise<void> {
   const { skip = 0, take = 10 } = req.pagination || {};
@@ -64,8 +64,6 @@ async function createUser(req: Request, res: Response): Promise<void> {
   const { body } = req as {
     body: User;
   };
-
-  
 
   if (!body) {
     res.status(400).json({
