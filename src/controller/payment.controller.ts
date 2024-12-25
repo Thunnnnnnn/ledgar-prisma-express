@@ -95,9 +95,7 @@ async function createPayment(req: Request, res: Response): Promise<void> {
         transactionSlip: {
           create: body.transactionSlip
             ? {
-                slipUrl: body.transactionSlip?.slipUrl
-                  ? body.transactionSlip?.slipUrl
-                  : undefined,
+                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ก่อนเพื่อได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้
                 note: body.transactionSlip?.note
                   ? censorBadWords(body.transactionSlip?.note)
                   : undefined,
@@ -157,7 +155,6 @@ async function createPayment(req: Request, res: Response): Promise<void> {
       data: payment,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       message: "Internal server error",
     });
@@ -206,9 +203,7 @@ async function updatePayment(req: Request, res: Response): Promise<void> {
         transactionSlip: {
           create: body.transactionSlip
             ? {
-                slipUrl: body.transactionSlip?.slipUrl
-                  ? body.transactionSlip?.slipUrl
-                  : undefined,
+                slipUrl: body.transactionSlip.slipUrl,
                 note: body.transactionSlip?.note
                   ? censorBadWords(body.transactionSlip?.note)
                   : undefined,
