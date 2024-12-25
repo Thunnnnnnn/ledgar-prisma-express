@@ -75,6 +75,7 @@ async function createPaymentType(req: Request, res: Response): Promise<void> {
     const paymentType = await db.paymentType.create({
       data: {
         name: body.name,
+        increment: body.increment ? body.increment : false,
       },
     });
 
@@ -118,6 +119,7 @@ async function updatePaymentType(req: Request, res: Response): Promise<void> {
       },
       data: {
         name: body.name ? body.name : undefined,
+        increment: body.increment ? body.increment : undefined,
       },
     });
 
