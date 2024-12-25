@@ -79,16 +79,16 @@ async function createUser(req: Request, res: Response): Promise<void> {
       message: "Invalid email or password",
     });
 
-    return
+    return;
   }
 
   const userExist = await db.user.findUnique({
     where: {
       email: body.email,
     },
-  })
+  });
 
-  if(userExist) {
+  if (userExist) {
     res.status(400).json({
       message: "Email already exist",
     });
@@ -186,10 +186,51 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function sumPaymentPerDate(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+
+    const summaryPayment = await db.user.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (!summaryPayment) {
+      res.status(400).json({
+        message: "User not found",
+      });
+
+      return;
+    }
+
+    const today = new Date();
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const daysRemaining =
+      (endOfMonth.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
+    const paymentPerDate = Number(summaryPayment?.cashBalance) / daysRemaining;
+
+    res.status(200).json({
+      message: "Get payment per date success",
+      data: {
+        user: summaryPayment,
+        paymentPerDate: parseFloat(paymentPerDate.toFixed(2)),
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
 export default {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  sumPaymentPerDate,
 };

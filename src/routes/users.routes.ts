@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/", paginationMiddleware, usersController.getUsers);
 router.get("/:id", usersController.getUser);
+router.get("/payment-per-date/:id", usersController.sumPaymentPerDate);
 router.post("/", usersController.createUser);
 router.put("/:id", usersController.updateUser);
 router.delete("/:id", usersController.deleteUser);
