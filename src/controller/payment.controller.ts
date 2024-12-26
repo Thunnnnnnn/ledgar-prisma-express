@@ -11,10 +11,68 @@ function censorBadWords(text: string): string {
 
 async function getPayments(req: Request, res: Response): Promise<void> {
   const { skip = 0, take = 10 } = req.pagination || {};
+  const { month, year, paymentTypeId, userId } = req.query as {
+    month: string;
+    year: string;
+    paymentTypeId: string;
+    userId: string;
+  };
+  let where = {};
+
+  if (month && !year) {
+    let setYear = new Date().getFullYear();
+    if (month === '12') {
+      setYear = setYear + 1;
+    }
+    where = {
+      createdAt: {
+        gte: new Date(`${new Date().getFullYear()}-${month}-01`),
+        lt: new Date(`${setYear}-${month}-01`),
+      },
+    };
+  }
+
+  if (!month && year) {
+    where = {
+      createdAt: {
+        gte: new Date(`${year}-01-01`),
+        lt: new Date(`${parseInt(year) + 1}-01-01`),
+      },
+    };
+  }
+
+  if (month && year) {
+    let setYear = parseInt(year)
+    if (month === '12') {
+      setYear = setYear + 1;
+    }
+    where = {
+      createdAt: {
+        gte: new Date(`${year}-${month}-01`),
+        lt: new Date(`${setYear}-${month}-01`),
+      },
+    };
+  }
+
+  if (paymentTypeId) {
+    where = {
+      ...where,
+      paymentTypeId: parseInt(paymentTypeId),
+    };
+  }
+
+  if (userId) {
+    where = {
+      ...where,
+      userId: parseInt(userId),
+    };
+  }
+
   try {
     const payments = await db.payment.findMany({
       skip,
       take,
+      where,
     });
 
     res.status(200).json({
@@ -22,6 +80,7 @@ async function getPayments(req: Request, res: Response): Promise<void> {
       data: payments,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Internal server error",
     });
