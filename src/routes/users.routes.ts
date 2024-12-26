@@ -17,7 +17,8 @@ router.get(
   authMiddleware.checkAuth,
   usersController.sumPaymentPerDate
 );
-router.post("/", authMiddleware.checkAuth, usersController.createUser);
+router.get("/export-payment/:id", authMiddleware.checkAuth, usersController.exportPayment);
+router.post("/", usersController.createUser);
 router.put("/:id", authMiddleware.checkAuth, usersController.updateUser);
 router.delete("/:id", authMiddleware.checkAuth, usersController.deleteUser);
 

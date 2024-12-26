@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { db } from "../untils/db";
 import { User } from "../type/users.type";
+import * as XLSX from "xlsx";
+import moment from "moment"
 
 const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10; // จำนวนรอบในการสร้าง salt
@@ -214,16 +216,81 @@ async function sumPaymentPerDate(req: Request, res: Response): Promise<void> {
     res.status(200).json({
       message: "Get payment per date success",
       data: {
-        user: summaryPayment,
+        remainMoney: parseFloat(summaryPayment?.cashBalance.toFixed(2)),
         paymentPerDate: parseFloat(paymentPerDate.toFixed(2)),
       },
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Internal server error",
     });
   }
+}
+
+async function exportPayment(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+
+  const userPayment = await db.payment.findMany({
+    where: {
+      userId: parseInt(id),
+    },
+    include: {
+      transactionSlip: true,
+      user: true,
+      paymentType: true
+    },
+  });
+
+  let exportExcel : any;
+
+  if (userPayment) {
+    try {
+      const worksheet = XLSX.utils.json_to_sheet(
+        userPayment.map((payment: any) => {
+          return {
+            user: payment.user.name,
+            paymentType: payment.paymentType.increment ? "รายรับ" : "รายจ่าย",
+            amount: payment.amount.toString(),
+            createdAt: moment(payment.createdAt).format('DD/MM/YYYY')
+          };
+        })
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Payments");
+      const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+
+      const formData = new FormData();
+      formData.append("file", blob, "payments.xlsx");
+
+      exportExcel = await fetch("http://localhost:3000/upload", {
+        headers: {
+          authorization: `${req.headers.authorization?.split("Bearer ")[1]}`,
+        },
+        method: "POST",
+        body: formData,
+      }).then(async (res) => {
+        return await res.json();
+      });
+
+
+      res.status(200).send({
+        message: "Get data payment success",
+        data: exportExcel.data
+      })
+    } catch (error) {
+      res.status(500).send({
+        message: "Something error when export",
+      });
+    }
+  } else {
+    res.status(200).json({
+      message: "No data payment in this user",
+    });
+  }
+
+  
 }
 
 export default {
@@ -233,4 +300,5 @@ export default {
   updateUser,
   deleteUser,
   sumPaymentPerDate,
+  exportPayment,
 };

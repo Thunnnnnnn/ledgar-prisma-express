@@ -4,6 +4,6 @@ import authMiddleware from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post("/", authMiddleware.checkAuth, uploadFile);
+router.post("/",  uploadFile);
 
 export default router;
