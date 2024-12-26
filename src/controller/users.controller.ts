@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 import { db } from "../untils/db";
 import { User } from "../type/users.type";
 import * as XLSX from "xlsx";
-import moment from "moment"
+import moment from "moment";
+import multer from "multer";
+import path from "path";
+import fs from 'fs';
 
 const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10; // จำนวนรอบในการสร้าง salt
@@ -237,11 +240,11 @@ async function exportPayment(req: Request, res: Response): Promise<void> {
     include: {
       transactionSlip: true,
       user: true,
-      paymentType: true
+      paymentType: true,
     },
   });
 
-  let exportExcel : any;
+  let exportExcel: any;
 
   if (userPayment) {
     try {
@@ -249,9 +252,9 @@ async function exportPayment(req: Request, res: Response): Promise<void> {
         userPayment.map((payment: any) => {
           return {
             user: payment.user.name,
-            paymentType: payment.paymentType.increment ? "รายรับ" : "รายจ่าย",
+            paymentType: payment.paymentType.name,
             amount: payment.amount.toString(),
-            createdAt: moment(payment.createdAt).format('DD/MM/YYYY')
+            createdAt: moment(payment.createdAt).format("DD/MM/YYYY"),
           };
         })
       );
@@ -274,11 +277,10 @@ async function exportPayment(req: Request, res: Response): Promise<void> {
         return await res.json();
       });
 
-
       res.status(200).send({
         message: "Get data payment success",
-        data: exportExcel.data
-      })
+        data: exportExcel.data,
+      });
     } catch (error) {
       res.status(500).send({
         message: "Something error when export",
@@ -289,8 +291,90 @@ async function exportPayment(req: Request, res: Response): Promise<void> {
       message: "No data payment in this user",
     });
   }
+}
 
-  
+async function importPayment(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!body) {
+    res.status(400).send({
+      message: "Body is requied",
+    });
+
+    return;
+  }
+
+  // ตั้งค่าโฟลเดอร์สำหรับไฟล์อัปโหลด
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, "../../uploads/")); // เก็บไฟล์ในโฟลเดอร์ uploads
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์ใหม่
+    },
+  });
+
+  const upload = multer({ storage });
+
+  try {
+    upload.single("file")(req, res, (err: any) => {
+      if (err) {
+        res.status(400).json({
+          message: "Upload file failed",
+        });
+      } else {
+
+        if (!req.file) {
+          res.status(400).json({
+            message: "No file uploaded",
+          });
+          return;
+        }
+        const workbook = XLSX.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        jsonData.forEach(async (data: any) => {
+          const paymentTypeId = await db.paymentType.findFirst({
+            where: {
+              name: data.paymentType
+            }
+          })
+
+          if (paymentTypeId) {
+            await db.payment.create({
+              data: {
+                paymentTypeId: paymentTypeId.id,
+                userId: parseInt(id),
+                amount: data.amount ? parseInt(data.amount) : 0
+              }
+            });
+          }
+        });
+        // Delete the uploaded file after processing
+        fs.unlink(req.file.path, (err: any) => {
+          if (err) {
+            console.error("Failed to delete file:", err);
+
+            res.status(200).send({
+              message: "Upload file success but not delete new file"
+            })
+          }
+        });
+
+        res.status(200).json({
+          message: "Upload file success",
+        });
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 }
 
 export default {
@@ -301,4 +385,5 @@ export default {
   deleteUser,
   sumPaymentPerDate,
   exportPayment,
+  importPayment,
 };
