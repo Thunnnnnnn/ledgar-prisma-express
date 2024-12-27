@@ -1,8 +1,6 @@
 # LEDGAR PROJECT
 
-This is API for user accounting.
-
-## Use branch dev to use this project
+This is API for user accounting.                
 
 ## Features
 
@@ -26,6 +24,12 @@ This is API for user accounting.
 - if you install node success you can check your version
 
       node -v
+
+### This project reuired branch dev
+
+- switch branch using:
+
+      git switch dev
 
 - Install Dependencies: Navigate to the project directory and install all required modules by running:
 
