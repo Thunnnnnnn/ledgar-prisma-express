@@ -154,14 +154,19 @@ async function createPayment(req: Request, res: Response): Promise<void> {
         transactionSlip: {
           create: body.transactionSlip
             ? {
-                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
-                note: body.transactionSlip?.note
-                  ? censorBadWords(body.transactionSlip?.note)
-                  : undefined,
-              }
+              slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
+              note: body.transactionSlip?.note
+                ? censorBadWords(body.transactionSlip?.note)
+                : undefined,
+            }
             : undefined,
         },
       },
+      include: {
+        paymentType: true,
+        transactionSlip: true,
+        user: true,
+      }
     });
 
     const paymentType = await db.paymentType.findUnique({
@@ -249,27 +254,32 @@ async function updatePayment(req: Request, res: Response): Promise<void> {
       },
       data: {
         amount: body.amount ? +body.amount : undefined,
-        user: {
+        user: body.userId ? {
           connect: {
-            id: body.userId ? +body.userId : undefined,
+            id: +body.userId
           },
-        },
-        paymentType: {
+        } : undefined,
+        paymentType: body.paymentTypeId ? {
           connect: {
-            id: body.paymentTypeId ? +body.paymentTypeId : undefined,
+            id: +body.paymentTypeId
           },
-        },
-        transactionSlip: {
-          update: body.transactionSlip
-            ? {
-                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
-                note: body.transactionSlip?.note
-                  ? censorBadWords(body.transactionSlip?.note)
-                  : undefined,
-              }
-            : undefined,
-        },
+        } : undefined,
+        transactionSlip: body.transactionSlip ? {
+          update: {
+            slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
+            note: body.transactionSlip?.note
+              ? censorBadWords(body.transactionSlip?.note)
+              : undefined,
+          }
+
+        } : undefined,
       },
+
+      include: {
+        paymentType: true,
+        transactionSlip: true,
+        user: true,
+      }
     });
 
     res.status(200).json({
