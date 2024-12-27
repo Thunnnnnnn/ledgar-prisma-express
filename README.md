@@ -1,6 +1,6 @@
 # LEDGAR PROJECT
 
-This is API for user accounting.
+This is API for user accounting.                
 
 ## Features
 
@@ -24,6 +24,12 @@ This is API for user accounting.
 - if you install node success you can check your version
 
       node -v
+
+### This project required branch dev
+
+- switch branch using:
+
+      git switch dev
 
 - Install Dependencies: Navigate to the project directory and install all required modules by running:
 
@@ -52,11 +58,11 @@ This is API for user accounting.
   - GET /users (Get all user in database.)
     - Optional query page and limit
       
-      EX.
+    EX.
 
-          GET http://localhost:3000/users
+        GET http://localhost:3000/users
 
-          GET http://localhost:3000/users?page=1&limit=10
+        GET http://localhost:3000/users?page=1&limit=10
 
     - Default page = 1 and limit = 10 if you choose not send a query.
 
@@ -107,20 +113,24 @@ This is API for user accounting.
    
     EX.
 
-        GET http://localhost:3000/users/import-payment/:id
+        GET http://localhost:3000/users/export-payment/:id
 
   - POST /users/import-payment/:id (Import payment in user to database)
     - Required body field and params id
+
+    EX.
+
+        POST http://localhost:3000/users/import-payment/:id
   
 - Path: /payment-types
   - GET /payment-types (Get all payment type in database.)
     - Optional query page and limit
       
-      EX.
+    EX.
 
-          GET http://localhost:3000/payment-types
+        GET http://localhost:3000/payment-types
 
-          GET http://localhost:3000/payment-types?page=1&limit=10
+        GET http://localhost:3000/payment-types?page=1&limit=10
 
     - Default page = 1 and limit = 10 if you choose not send a query.
 
@@ -155,9 +165,9 @@ This is API for user accounting.
         - email
         - password
       
-      EX.
+    EX.
 
-          POST http://localhost:3000/auth/login
+        POST http://localhost:3000/auth/login
 
 
   - POST /logout (logout)
@@ -232,3 +242,4 @@ This is API for user accounting.
 
         DELETE  http://localhost:3000/payments/:id
   
+
