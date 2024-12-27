@@ -154,7 +154,7 @@ async function createPayment(req: Request, res: Response): Promise<void> {
         transactionSlip: {
           create: body.transactionSlip
             ? {
-                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ก่อนเพื่อได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้
+                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
                 note: body.transactionSlip?.note
                   ? censorBadWords(body.transactionSlip?.note)
                   : undefined,
@@ -260,9 +260,9 @@ async function updatePayment(req: Request, res: Response): Promise<void> {
           },
         },
         transactionSlip: {
-          create: body.transactionSlip
+          update: body.transactionSlip
             ? {
-                slipUrl: body.transactionSlip.slipUrl,
+                slipUrl: body.transactionSlip.slipUrl, // ต้อง upload ไฟล์ให้ได้ URL ก่อน เพื่อนำมาใส่ในฐานข้อมูล ไม่สามารถส่งไฟล์มาตรงๆได้ (API /upload)
                 note: body.transactionSlip?.note
                   ? censorBadWords(body.transactionSlip?.note)
                   : undefined,
