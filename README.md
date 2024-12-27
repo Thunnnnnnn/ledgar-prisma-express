@@ -25,7 +25,7 @@ This is API for user accounting.
 
       node -v
 
-### This project reuired branch dev
+### This project required branch dev
 
 - switch branch using:
 
